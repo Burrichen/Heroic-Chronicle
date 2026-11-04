@@ -919,7 +919,7 @@ kbd {
   color: var(--text-2);
   font-size: 0.92rem;
 }
-.start-choice.is-primary strong {
+.start-choice:hover strong {
   color: var(--moss);
 }
 .start-resume {

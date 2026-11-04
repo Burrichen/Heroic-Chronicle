@@ -55,7 +55,7 @@ export function Start({ def, theme, hasProgress, onToggleTheme, onGuided, onAuto
         </p>
 
         <div className="start-choices">
-          <button type="button" className="start-choice is-primary" onClick={onGuided}>
+          <button type="button" className="start-choice" onClick={onGuided}>
             <Footprints aria-hidden="true" />
             <strong>Walk the chronicle</strong>
             <span>Go step by step. Roll each table, pick a result, or type in your own dice.</span>
