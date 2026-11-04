@@ -8,7 +8,7 @@ web (packaged as a desktop app)
 
 ## Stack
 
-React 18 + TypeScript + Vite, in `app/`. Chosen by the developer, not specified by the owner. Distributed as a desktop application wrapping the web build.
+React 18 + TypeScript + Vite, in `app/` (proposed by the developer, confirmed by the owner). Packaged as a desktop application with **Tauri**, wrapping the web build.
 
 ## Purpose
 
@@ -23,7 +23,7 @@ A guided runner for the Heroic Chronicle backstory system: a sequence of dice ta
 
 1. Step through the chronicle one decision at a time, either rolling a virtual die, choosing a result from the table, or typing a physical die's number.
 2. Run the whole chronicle automatically when the group wants a fast random character.
-3. Review the finished chronicle, name the character, and keep or share the result.
+3. Review the finished chronicle in the app, name the character, and save it as a Markdown (`.md`) file. Viewing in the app and saving as `.md` are the only export paths for now.
 
 ## Constraints and product truths
 
@@ -39,5 +39,4 @@ Mostly desktop. Smaller windows and phones should still work.
 
 ## Open decisions
 
-- Desktop packaging technology.
-- Export formats beyond copy/download (e.g. PDF, sharing with a DM).
+None recorded.
