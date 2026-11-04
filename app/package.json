@@ -13,8 +13,9 @@
     "desktop:build": "tauri build"
   },
   "dependencies": {
-    "@fontsource/inter": "^5.1.0",
-    "@fontsource/marcellus": "^5.1.0",
+    "@fontsource/alegreya": "^5.1.0",
+    "@fontsource/alegreya-sans": "^5.1.0",
+    "@fontsource/alegreya-sc": "^5.1.0",
     "@tauri-apps/plugin-dialog": "^2.0.1",
     "@tauri-apps/plugin-fs": "^2.0.3",
     "lucide-react": "^0.460.0",

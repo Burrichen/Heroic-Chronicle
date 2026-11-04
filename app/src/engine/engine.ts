@@ -106,3 +106,25 @@ export function progress(def: ChronicleDef, results: Results): { done: number; t
   const plan = def.plan(results);
   return { done: plan.filter((s) => s.key in results).length, total: plan.length };
 }
+
+/**
+ * Progress through the chronicle's chapters (sections), for the progress bar.
+ * The plan grows as results come in (extra allies, fateful moments), so a raw
+ * step count would jump backwards. Instead, each finished chapter counts as
+ * one whole share, and the current chapter adds its known fraction, capped
+ * below a full share until the chapter is actually done.
+ */
+export function chapterProgress(
+  def: ChronicleDef,
+  results: Results,
+): { fraction: number; chapter: number; chapters: number } {
+  const chapters = def.sections.length;
+  const plan = def.plan(results);
+  const step = plan.find((s) => !(s.key in results));
+  if (!step) return { fraction: 1, chapter: chapters, chapters };
+  const chapter = Math.max(0, def.sections.findIndex((s) => s.id === step.section));
+  const inChapter = plan.filter((s) => s.section === step.section);
+  const done = inChapter.filter((s) => s.key in results).length;
+  const within = Math.min(done / Math.max(inChapter.length, 1), 0.9);
+  return { fraction: (chapter + within) / chapters, chapter, chapters };
+}

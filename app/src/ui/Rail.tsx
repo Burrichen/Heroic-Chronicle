@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { ChevronDown, Moon, RotateCcw, Sun } from 'lucide-react';
 import { resolutionText } from '../engine/describe';
+import { chapterProgress } from '../engine/engine';
 import type { ChronicleDef, Results } from '../engine/types';
-import { Moss } from './Moss';
+import { Crest } from './Heraldry';
 import type { Theme } from './storage';
 
 interface RailProps {
@@ -23,14 +24,46 @@ export function Rail({ def, results, currentKey, theme, onToggleTheme, onRevisit
   const plan = def.plan(results);
   const currentSection = plan.find((s) => s.key === currentKey)?.section;
   const currentIdx = currentSection ? def.sections.findIndex((s) => s.id === currentSection) : def.sections.length;
-  const doneCount = plan.filter((s) => s.key in results && !def.hiddenInRail?.(s.key)).length;
-  const stripLabel = currentSection ? def.sections[currentIdx].title : 'Chronicle complete';
+  const prog = chapterProgress(def, results);
+  const pct = Math.round(prog.fraction * 100);
+  const chapterLabel =
+    prog.chapter < prog.chapters ? `Chapter ${prog.chapter + 1} of ${prog.chapters}` : 'Every chapter written';
+  const stripLabel = currentSection
+    ? `${prog.chapter + 1} of ${prog.chapters} · ${def.sections[currentIdx].title}`
+    : 'Every chapter written';
+  const track = (
+    <span className="progress-track" aria-hidden="true">
+      <span className="progress-fill" style={{ width: `${pct}%` }} />
+      {def.sections.slice(1).map((s, i) => (
+        <span key={s.id} className="progress-tick" style={{ left: `${((i + 1) / prog.chapters) * 100}%` }} />
+      ))}
+    </span>
+  );
 
   return (
     <aside className={`rail${open ? ' is-open' : ''}`} aria-label="Your chronicle so far">
       <div className="rail-head">
-        <h1>{def.name}</h1>
-        <p>{def.tagline}</p>
+        <Crest />
+        <div>
+          <h1>{def.name}</h1>
+          <p>{def.tagline}</p>
+        </div>
+      </div>
+
+      <div
+        className="progress"
+        role="progressbar"
+        aria-label="Chronicle progress"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct}
+        aria-valuetext={`${chapterLabel}, ${pct}%`}
+      >
+        <div className="progress-head">
+          <span>{chapterLabel}</span>
+          <span className="num">{pct}%</span>
+        </div>
+        {track}
       </div>
 
       <button
@@ -40,13 +73,9 @@ export function Rail({ def, results, currentKey, theme, onToggleTheme, onRevisit
         aria-controls="rail-body"
         onClick={() => setOpen((o) => !o)}
       >
-        <span className="dots" aria-hidden="true">
-          {def.sections.map((sec, si) => (
-            <span key={sec.id} className={si < currentIdx ? 'is-done' : si === currentIdx ? 'is-current' : ''} />
-          ))}
-        </span>
         <span className="t">{stripLabel}</span>
-        <span className="n">{doneCount} recorded</span>
+        {track}
+        <span className="n num">{pct}%</span>
         <ChevronDown aria-hidden="true" />
       </button>
 
@@ -117,8 +146,6 @@ export function Rail({ def, results, currentKey, theme, onToggleTheme, onRevisit
           );
         })}
       </nav>
-
-      <Moss id="rail-moss" from="bottom" width={300} height={150} seed={4} style={{ left: 0, bottom: 0 }} />
 
       <div className="rail-foot">
         <button

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Download, Star } from 'lucide-react';
 import { toMarkdown } from '../engine/describe';
 import type { ChronicleDef, Results, SummaryItem, SummarySection } from '../engine/types';
+import { Corners, Crest } from './Heraldry';
 import { fileNameFor, saveTextFile } from './saveFile';
 
 interface SummaryProps {
@@ -71,30 +72,35 @@ export function Summary({ def, results, name, onName }: SummaryProps) {
   return (
     <div className="summary">
       <header className="summary-head">
-        <label htmlFor="hero-name">Name your hero</label>
-        <input
-          id="hero-name"
-          className="name-field"
-          placeholder="An unnamed hero"
-          value={name}
-          autoComplete="off"
-          spellCheck={false}
-          onChange={(e) => onName(e.target.value)}
-        />
-        <p className="summary-sub">Their chronicle is written. Read it through, then save a copy for the table.</p>
+        <Corners />
+        <Crest className="summary-crest" />
+        <div className="summary-title">
+          <label htmlFor="hero-name" className="visually-hidden">
+            Name your hero
+          </label>
+          <input
+            id="hero-name"
+            className="name-field"
+            placeholder="Name your hero"
+            value={name}
+            autoComplete="off"
+            spellCheck={false}
+            onChange={(e) => onName(e.target.value)}
+          />
+          <p className="summary-sub">Their chronicle is written. Read it through, then save a copy for the table.</p>
+          <div className="summary-actions">
+            <button type="button" className="btn btn-primary btn-lg" onClick={save}>
+              <Download aria-hidden="true" />
+              Save as .md
+            </button>
+            {status && (
+              <span className="status" role="status">
+                {status}
+              </span>
+            )}
+          </div>
+        </div>
       </header>
-
-      <div className="summary-actions">
-        <button type="button" className="btn btn-primary btn-lg" onClick={save}>
-          <Download aria-hidden="true" />
-          Save as .md
-        </button>
-        {status && (
-          <span className="status" role="status">
-            {status}
-          </span>
-        )}
-      </div>
 
       <div className="summary-grid">
         <div className="sum-col">{sections.filter((s) => LEFT.has(s.title)).map(renderSection)}</div>

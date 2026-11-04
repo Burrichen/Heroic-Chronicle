@@ -111,3 +111,24 @@ describe('prophecy sentences', async () => {
     );
   });
 });
+
+describe('chapter progress', async () => {
+  const { chapterProgress } = await import('./engine');
+  it('starts at zero, never goes backwards, and ends at one', () => {
+    for (let seed = 0; seed < 50; seed++) {
+      const rng = seeded(seed);
+      let R: Results = {};
+      let last = chapterProgress(def, R).fraction;
+      expect(last).toBe(0);
+      for (let i = 0; i < 200; i++) {
+        const step = currentStep(def, R);
+        if (!step) break;
+        R = resolve(def, R, step.key, autoResolve(step, rng));
+        const p = chapterProgress(def, R).fraction;
+        expect(p).toBeGreaterThanOrEqual(last);
+        last = p;
+      }
+      expect(last).toBe(1);
+    }
+  });
+});

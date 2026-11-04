@@ -11,6 +11,7 @@ import type {
   TableStep,
   TextStep,
 } from '../engine/types';
+import { Corners, Shield } from './Heraldry';
 import { useSweep } from './useSweep';
 
 interface StepViewProps {
@@ -126,7 +127,10 @@ interface SlabProps {
 function Slab({ roll, word, sweeping, title, detail, sub, onContinue, onReroll, rerollLabel = 'Roll again', extra }: SlabProps) {
   return (
     <section className="slab" aria-live="polite">
-      <div className={`slab-roll num${word ? ' is-word' : ''}${sweeping ? ' is-sweeping' : ''}`}>{roll}</div>
+      <Corners />
+      <Shield word={word} dim={sweeping}>
+        {roll}
+      </Shield>
       <div className="slab-body">
         <h3>{title}</h3>
         {detail && <p className="detail">{detail}</p>}
@@ -307,6 +311,9 @@ function TableBody({ step, pending, setPending, onCommit, auto }: BodyProps<Tabl
           />
         ) : (
           <div className="roll-bar">
+            <Shield word dim decorative>
+              {table.die}
+            </Shield>
             <button type="button" className="btn btn-primary btn-lg" onClick={roll} disabled={sweeping}>
               <Dices aria-hidden="true" />
               {sweeping ? 'Rolling…' : `Roll ${table.die}`}
@@ -327,7 +334,7 @@ function TableBody({ step, pending, setPending, onCommit, auto }: BodyProps<Tabl
           </div>
         )}
       </div>
-      <div className="table-wrap">
+      <div className={`table-wrap${step.tone ? ` tone-${step.tone}` : ''}`}>
         <div className="table-cap">
           <strong>{table.title}</strong>
           <span className="num">{table.die}</span>
@@ -480,6 +487,9 @@ function DiceBody({ step, pending, setPending, onCommit, auto }: BodyProps<DiceS
         />
       ) : (
         <div className="roll-bar">
+          <Shield word dim decorative>
+            {step.dice}
+          </Shield>
           <button type="button" className="btn btn-primary btn-lg" onClick={roll}>
             <Dices aria-hidden="true" />
             Roll {label}

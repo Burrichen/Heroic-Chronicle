@@ -342,6 +342,7 @@ export function walk(R: Results): { steps: Step[]; d: Derived } {
       title: slot.kind === 'ally' ? `Your ${label}: what binds you?` : `Your ${label}: what stands between you?`,
       intro: slot.kind === 'ally' ? 'How did this ally come into your life?' : 'Why does this rival have it in for you?',
       table: slot.kind === 'ally' ? allyRelationshipTable : rivalRelationshipTable,
+      tone: slot.kind,
     });
     const relIdx = rowIndex(R, `acq-${slot.index}-rel`);
     if (relIdx === undefined) return done();
@@ -368,6 +369,7 @@ export function walk(R: Results): { steps: Step[]; d: Derived } {
       intro: 'Their identity gives them a stat block. Results marked “Fateful moment” are someone powerful, and earn you a fateful moment.',
       note: 'The DM may make this roll in secret, to keep their true nature hidden.',
       table: identityTable,
+      tone: slot.kind,
     });
     const idIdx = rowIndex(R, `acq-${slot.index}-id`);
     if (idIdx === undefined) return done();

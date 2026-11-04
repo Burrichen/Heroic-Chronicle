@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { getChronicle } from '../chronicles';
 import { autoComplete, currentStep, isComplete, previousStep, prune, resolve, rewindTo } from '../engine/engine';
 import type { Resolution, Results } from '../engine/types';
-import { Moss } from './Moss';
 import { Rail } from './Rail';
 import { Start } from './Start';
 import { StepView } from './StepView';
@@ -105,14 +104,6 @@ export function App() {
         onRestart={restart}
       />
       <main className="main">
-        <Moss
-          id="main-moss"
-          from="top-right"
-          width={520}
-          height={260}
-          seed={13}
-          style={{ top: 0, right: 0, opacity: 0.55 }}
-        />
         <div className="main-inner">
           {showSummary || !step ? (
             <Summary def={def} results={results} name={name} onName={setName} />

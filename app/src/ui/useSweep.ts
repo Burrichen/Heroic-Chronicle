@@ -28,9 +28,9 @@ export function useSweep() {
       return;
     }
     setSweeping(true);
-    const hops = 14;
+    const hops = 10;
     let t = 0;
-    let delay = 32;
+    let delay = 22;
     let prev = -1;
     for (let i = 0; i < hops; i++) {
       const last = i === hops - 1;
@@ -38,7 +38,7 @@ export function useSweep() {
       if (!last && idx === prev) idx = (idx + 1) % count;
       prev = idx;
       t += delay;
-      delay *= 1.19;
+      delay *= 1.16;
       timers.current.push(
         window.setTimeout(() => {
           setLit(idx);
@@ -48,7 +48,7 @@ export function useSweep() {
                 setSweeping(false);
                 setLit(null);
                 done();
-              }, 280),
+              }, 160),
             );
           }
         }, t),

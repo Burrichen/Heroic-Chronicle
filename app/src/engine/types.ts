@@ -59,6 +59,8 @@ interface StepBase {
 export interface TableStep extends StepBase {
   type: 'table';
   table: Table;
+  /** Colours the table for an ally or a rival. */
+  tone?: 'ally' | 'rival';
 }
 
 export interface DiceStep extends StepBase {
