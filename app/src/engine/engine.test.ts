@@ -97,3 +97,17 @@ describe('original chronicle flow', () => {
     expect(currentStep(def, back)?.key).toBe('background');
   });
 });
+
+describe('prophecy sentences', async () => {
+  const { joinGoal } = await import('../chronicles/original/summary');
+  it('joins table complications as one sentence', () => {
+    expect(joinGoal('Join a blood hunter order', 'and gain power at a steep price')).toBe(
+      'Join a blood hunter order, and gain power at a steep price',
+    );
+  });
+  it('keeps player-written complications as their own sentence', () => {
+    expect(joinGoal('Find my sister', 'She does not want to be found.')).toBe(
+      'Find my sister. Complication: She does not want to be found.',
+    );
+  });
+});

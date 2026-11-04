@@ -13,15 +13,15 @@ interface SummaryProps {
 
 const WIDE = new Set(['Prophecy', 'Prophecy rewards']);
 /** Who the hero is on the left; what they carry and who they know on the right. */
-const LEFT = new Set(['Origins', 'Family', 'Quirks & mysteries']);
+const LEFT = new Set(['Origins', 'Family']);
 
 function renderSection(s: SummarySection) {
   return (
     <section
       key={s.title}
-      className={`sum-section${WIDE.has(s.title) ? ' is-wide' : ''}${s.title === 'Mechanical benefits' ? ' is-boons' : ''}`}
+      className={`sum-section${WIDE.has(s.title) ? ' is-wide' : ''}${s.title === 'Mechanical benefits' && s.items.length ? ' is-boons' : ''}`}
     >
-      <h3 className="carved">{s.title}</h3>
+      <h3>{s.title}</h3>
       {s.items.length ? (
         <dl className="sum-items">
           {s.items.map((item, i) => (
@@ -74,7 +74,7 @@ export function Summary({ def, results, name, onName }: SummaryProps) {
         <label htmlFor="hero-name">Name your hero</label>
         <input
           id="hero-name"
-          className="name-field carved"
+          className="name-field"
           placeholder="An unnamed hero"
           value={name}
           autoComplete="off"

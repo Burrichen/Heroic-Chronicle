@@ -48,14 +48,14 @@ export function Start({ def, theme, hasProgress, onToggleTheme, onGuided, onAuto
 
       <div className="start-inner">
         <Mark />
-        <h1 className="carved">{def.name}</h1>
+        <h1>{def.name}</h1>
         <p className="lede">
           Uncover where your hero comes from, who stands beside them, who stands against them, and what fate has
           written for them.
         </p>
 
         <div className="start-choices">
-          <button type="button" className="start-choice" onClick={onGuided}>
+          <button type="button" className="start-choice is-primary" onClick={onGuided}>
             <Footprints aria-hidden="true" />
             <strong>Walk the chronicle</strong>
             <span>Go step by step. Roll each table, pick a result, or type in your own dice.</span>

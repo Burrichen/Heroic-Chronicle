@@ -20,6 +20,18 @@ import {
   settlementTables,
 } from './tables';
 
+/**
+ * A goal and its complication read as one sentence. The inspiration table's
+ * complications are continuations ("and lose my sense of purpose"); a
+ * player-written complication that starts a new sentence gets its own.
+ */
+export function joinGoal(goal = '', comp = ''): string {
+  if (!comp) return goal || '—';
+  if (!goal) return `Complication: ${comp}`;
+  const continues = /^(and|but|which|by|or|then|so|reject|know)\b/i.test(comp);
+  return continues ? `${goal.replace(/[.,;]\s*$/, '')}, ${comp}` : `${goal.replace(/\s*$/, '')}. Complication: ${comp}`;
+}
+
 export function summarize(R: Results): SummarySection[] {
   const { d } = walk(R);
   const sections: SummarySection[] = [];
@@ -136,7 +148,7 @@ export function summarize(R: Results): SummarySection[] {
     ]) {
       const goal = p.values[`${id}.goal`]?.trim();
       const comp = p.values[`${id}.complication`]?.trim();
-      if (goal || comp) goals.push({ label, value: goal || '—', detail: comp ? `Complication: ${comp}` : undefined });
+      if (goal || comp) goals.push({ label, value: joinGoal(goal, comp) });
     }
     sections.push({
       title: 'Prophecy',
@@ -153,7 +165,7 @@ export function summarize(R: Results): SummarySection[] {
   sections.splice(1, 0, {
     title: 'Mechanical benefits',
     items: benefits,
-    empty: 'No mechanical benefits from your chronicle. Fateful moments come only from a ★ identity.',
+    empty: 'None this time. Fateful moments, the main source of benefits, come only from a powerful ally or rival.',
   });
   return sections;
 }

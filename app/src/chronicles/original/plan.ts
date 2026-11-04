@@ -365,7 +365,7 @@ export function walk(R: Results): { steps: Step[]; d: Derived } {
       type: 'table',
       section: 'bonds',
       title: `Who is your ${label}?`,
-      intro: 'Their identity gives them a stat block. A ★ result marks someone powerful, and earns you a fateful moment.',
+      intro: 'Their identity gives them a stat block. Results marked “Fateful moment” are someone powerful, and earn you a fateful moment.',
       note: 'The DM may make this roll in secret, to keep their true nature hidden.',
       table: identityTable,
     });

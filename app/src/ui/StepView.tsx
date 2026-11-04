@@ -26,6 +26,12 @@ interface StepViewProps {
 export function StepView({ step, initial, canBack, onBack, onCommit, onAuto }: StepViewProps) {
   const headRef = useRef<HTMLHeadingElement>(null);
   const [pending, setPending] = useState<Resolution | null>(initial ?? null);
+  const auto = (
+    <button type="button" className="btn btn-ghost" onClick={() => onAuto(pending)}>
+      <Sparkles aria-hidden="true" />
+      Roll the rest for me
+    </button>
+  );
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -43,25 +49,21 @@ export function StepView({ step, initial, canBack, onBack, onCommit, onAuto }: S
         ) : (
           <span />
         )}
-        <button type="button" className="btn btn-ghost" onClick={() => onAuto(pending)}>
-          <Sparkles aria-hidden="true" />
-          Roll the rest for me
-        </button>
       </div>
 
       <header className="step-head">
-        <h2 ref={headRef} tabIndex={-1} className="carved">
+        <h2 ref={headRef} tabIndex={-1}>
           {step.title}
         </h2>
         {step.intro && <p className="intro">{step.intro}</p>}
         {step.note && <p className="note">{step.note}</p>}
       </header>
 
-      {step.type === 'table' && <TableBody step={step} pending={pending} setPending={setPending} onCommit={onCommit} />}
-      {step.type === 'choice' && <ChoiceBody step={step} pending={pending} setPending={setPending} onCommit={onCommit} />}
-      {step.type === 'dice' && <DiceBody step={step} pending={pending} setPending={setPending} onCommit={onCommit} />}
-      {step.type === 'info' && <InfoBody step={step} onCommit={onCommit} />}
-      {step.type === 'text' && <TextBody step={step} initial={initial} onCommit={onCommit} />}
+      {step.type === 'table' && <TableBody step={step} pending={pending} setPending={setPending} onCommit={onCommit} auto={auto} />}
+      {step.type === 'choice' && <ChoiceBody step={step} pending={pending} setPending={setPending} onCommit={onCommit} auto={auto} />}
+      {step.type === 'dice' && <DiceBody step={step} pending={pending} setPending={setPending} onCommit={onCommit} auto={auto} />}
+      {step.type === 'info' && <InfoBody step={step} onCommit={onCommit} auto={auto} />}
+      {step.type === 'text' && <TextBody step={step} initial={initial} onCommit={onCommit} auto={auto} />}
     </div>
   );
 }
@@ -73,6 +75,8 @@ interface BodyProps<S extends Step> {
   pending: Resolution | null;
   setPending: (r: Resolution | null) => void;
   onCommit: (r: Resolution) => void;
+  /** The "Roll the rest for me" button, placed in each body's action row. */
+  auto: ReactNode;
 }
 
 /** Enter continues, R rolls, unless the user is typing. */
@@ -116,14 +120,15 @@ interface SlabProps {
   onContinue?: () => void;
   onReroll?: () => void;
   rerollLabel?: string;
+  extra?: ReactNode;
 }
 
-function Slab({ roll, word, sweeping, title, detail, sub, onContinue, onReroll, rerollLabel = 'Roll again' }: SlabProps) {
+function Slab({ roll, word, sweeping, title, detail, sub, onContinue, onReroll, rerollLabel = 'Roll again', extra }: SlabProps) {
   return (
     <section className="slab" aria-live="polite">
-      <div className={`slab-roll num carved${word ? ' is-word' : ''}${sweeping ? ' is-sweeping' : ''}`}>{roll}</div>
+      <div className={`slab-roll num${word ? ' is-word' : ''}${sweeping ? ' is-sweeping' : ''}`}>{roll}</div>
       <div className="slab-body">
-        <h3 className="carved">{title}</h3>
+        <h3>{title}</h3>
         {detail && <p className="detail">{detail}</p>}
         {sub && <p className="sub">{sub}</p>}
       </div>
@@ -141,6 +146,7 @@ function Slab({ roll, word, sweeping, title, detail, sub, onContinue, onReroll, 
           <span className="hint">
             <kbd>Enter</kbd> to continue{onReroll ? <> · <kbd>R</kbd> to roll again</> : null}
           </span>
+          {extra}
         </div>
       )}
     </section>
@@ -260,7 +266,7 @@ function TypedRoll({
 
 // ── Table step ──────────────────────────────────────────────────────────────
 
-function TableBody({ step, pending, setPending, onCommit }: BodyProps<TableStep>) {
+function TableBody({ step, pending, setPending, onCommit, auto }: BodyProps<TableStep>) {
   const { table } = step;
   const sides = tableSides(table);
   const { lit, sweeping, run } = useSweep();
@@ -297,6 +303,7 @@ function TableBody({ step, pending, setPending, onCommit }: BodyProps<TableStep>
             detail={row.detail}
             onContinue={commit}
             onReroll={roll}
+            extra={auto}
           />
         ) : (
           <div className="roll-bar">
@@ -304,7 +311,7 @@ function TableBody({ step, pending, setPending, onCommit }: BodyProps<TableStep>
               <Dices aria-hidden="true" />
               {sweeping ? 'Rolling…' : `Roll ${table.die}`}
             </button>
-            <span className="or">or type your own roll</span>
+            <span className="or">or type a roll</span>
             <TypedRoll
               label={`Your ${table.die} roll`}
               min={1}
@@ -314,8 +321,9 @@ function TableBody({ step, pending, setPending, onCommit }: BodyProps<TableStep>
               onRoll={(n) => setPending({ kind: 'table', roll: n, rowIndex: findRowIndex(table, n), method: 'rolled' })}
             />
             <span className="hint">
-              or pick a row · <kbd>R</kbd> to roll
+              <kbd>R</kbd> to roll
             </span>
+            {auto}
           </div>
         )}
       </div>
@@ -342,7 +350,7 @@ function TableBody({ step, pending, setPending, onCommit }: BodyProps<TableStep>
 
 // ── Choice step ─────────────────────────────────────────────────────────────
 
-function ChoiceBody({ step, pending, setPending, onCommit }: BodyProps<ChoiceStep>) {
+function ChoiceBody({ step, pending, setPending, onCommit, auto }: BodyProps<ChoiceStep>) {
   const { lit, sweeping, run } = useSweep();
   const [custom, setCustom] = useState('');
   const current = pending?.kind === 'choice' ? pending : null;
@@ -377,6 +385,7 @@ function ChoiceBody({ step, pending, setPending, onCommit }: BodyProps<ChoiceSte
             onContinue={commit}
             onReroll={roll}
             rerollLabel="Let fate choose again"
+            extra={auto}
           />
         ) : (
           <div className="roll-bar">
@@ -388,6 +397,7 @@ function ChoiceBody({ step, pending, setPending, onCommit }: BodyProps<ChoiceSte
             <span className="hint">
               <kbd>R</kbd> to let fate choose
             </span>
+            {auto}
           </div>
         )}
       </div>
@@ -436,7 +446,7 @@ function ChoiceBody({ step, pending, setPending, onCommit }: BodyProps<ChoiceSte
 
 // ── Dice step ───────────────────────────────────────────────────────────────
 
-function DiceBody({ step, pending, setPending, onCommit }: BodyProps<DiceStep>) {
+function DiceBody({ step, pending, setPending, onCommit, auto }: BodyProps<DiceStep>) {
   const [lo, hi] = diceRange(step.dice);
   const { lit, sweeping, run } = useSweep();
   const current = pending?.kind === 'dice' ? pending : null;
@@ -466,6 +476,7 @@ function DiceBody({ step, pending, setPending, onCommit }: BodyProps<DiceStep>) 
           sub={current.rolls.length > 1 ? `Rolled ${current.rolls.join(' + ')}${label.includes('+ ') ? ` + ${label.split('+ ')[1]}` : ''}` : undefined}
           onContinue={commit}
           onReroll={roll}
+          extra={auto}
         />
       ) : (
         <div className="roll-bar">
@@ -473,7 +484,7 @@ function DiceBody({ step, pending, setPending, onCommit }: BodyProps<DiceStep>) 
             <Dices aria-hidden="true" />
             Roll {label}
           </button>
-          <span className="or">or type your own total</span>
+          <span className="or">or type a total</span>
           <TypedRoll
             label={`Your ${label} total`}
             min={lo}
@@ -483,6 +494,7 @@ function DiceBody({ step, pending, setPending, onCommit }: BodyProps<DiceStep>) 
           <span className="hint">
             <kbd>R</kbd> to roll
           </span>
+          {auto}
         </div>
       )}
     </div>
@@ -491,7 +503,7 @@ function DiceBody({ step, pending, setPending, onCommit }: BodyProps<DiceStep>) 
 
 // ── Info step ───────────────────────────────────────────────────────────────
 
-function InfoBody({ step, onCommit }: { step: InfoStep; onCommit: (r: Resolution) => void }) {
+function InfoBody({ step, onCommit, auto }: { step: InfoStep; onCommit: (r: Resolution) => void; auto: ReactNode }) {
   const commit = useCallback(() => onCommit({ kind: 'info', method: 'chosen' }), [onCommit]);
   useStepKeys(commit);
   return (
@@ -508,6 +520,7 @@ function InfoBody({ step, onCommit }: { step: InfoStep; onCommit: (r: Resolution
         <span className="hint">
           <kbd>Enter</kbd> to continue
         </span>
+        {auto}
       </div>
     </>
   );
@@ -519,10 +532,12 @@ function TextBody({
   step,
   initial,
   onCommit,
+  auto,
 }: {
   step: TextStep;
   initial?: Resolution;
   onCommit: (r: Resolution) => void;
+  auto: ReactNode;
 }) {
   const [values, setValues] = useState<Record<string, string>>(initial?.kind === 'text' ? initial.values : {});
   const [rolled, setRolled] = useState<Record<string, number>>({});
@@ -548,7 +563,7 @@ function TextBody({
         {step.groups.map((g) => (
           <section key={g.id} className="goal" aria-labelledby={`goal-${g.id}`}>
             <div className="goal-head">
-              <h3 id={`goal-${g.id}`} className="carved">
+              <h3 id={`goal-${g.id}`}>
                 {g.title}
                 {g.hint && <span className="hint">{g.hint}</span>}
               </h3>
@@ -584,6 +599,7 @@ function TextBody({
         >
           Complete the chronicle
         </button>
+        {auto}
       </div>
     </>
   );

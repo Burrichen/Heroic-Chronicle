@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Moon, RotateCcw, Sun } from 'lucide-react';
+import { ChevronDown, Moon, RotateCcw, Sun } from 'lucide-react';
 import { resolutionText } from '../engine/describe';
 import type { ChronicleDef, Results } from '../engine/types';
 import { Moss } from './Moss';
@@ -18,18 +18,39 @@ interface RailProps {
 export function Rail({ def, results, currentKey, theme, onToggleTheme, onRevisit, onRestart }: RailProps) {
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
   const [confirmRestart, setConfirmRestart] = useState(false);
+  /** Small windows: the chronicle collapses into a strip that opens on demand. */
+  const [open, setOpen] = useState(false);
   const plan = def.plan(results);
   const currentSection = plan.find((s) => s.key === currentKey)?.section;
   const currentIdx = currentSection ? def.sections.findIndex((s) => s.id === currentSection) : def.sections.length;
+  const doneCount = plan.filter((s) => s.key in results && !def.hiddenInRail?.(s.key)).length;
+  const stripLabel = currentSection ? def.sections[currentIdx].title : 'Chronicle complete';
 
   return (
-    <aside className="rail" aria-label="Your chronicle so far">
+    <aside className={`rail${open ? ' is-open' : ''}`} aria-label="Your chronicle so far">
       <div className="rail-head">
-        <h1 className="carved">{def.name}</h1>
+        <h1>{def.name}</h1>
         <p>{def.tagline}</p>
       </div>
 
-      <nav className="rail-body">
+      <button
+        type="button"
+        className="rail-strip"
+        aria-expanded={open}
+        aria-controls="rail-body"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span className="dots" aria-hidden="true">
+          {def.sections.map((sec, si) => (
+            <span key={sec.id} className={si < currentIdx ? 'is-done' : si === currentIdx ? 'is-current' : ''} />
+          ))}
+        </span>
+        <span className="t">{stripLabel}</span>
+        <span className="n">{doneCount} recorded</span>
+        <ChevronDown aria-hidden="true" />
+      </button>
+
+      <nav className="rail-body" id="rail-body">
         {def.sections.map((sec, si) => {
           const entries = plan.filter(
             (s) => s.section === sec.id && !def.hiddenInRail?.(s.key) && (s.key in results || s.key === currentKey),
@@ -46,7 +67,7 @@ export function Rail({ def, results, currentKey, theme, onToggleTheme, onRevisit
                   {entries.map((s) => {
                     const res = results[s.key];
                     const isNow = s.key === currentKey;
-                    const value = isNow ? 'now' : res ? resolutionText(s, res) : '';
+                    const value = res && !isNow ? resolutionText(s, res) : '';
                     return (
                       <li key={s.key}>
                         <button
@@ -57,7 +78,14 @@ export function Rail({ def, results, currentKey, theme, onToggleTheme, onRevisit
                           onClick={() => !isNow && setConfirmKey(confirmKey === s.key ? null : s.key)}
                         >
                           <span className="k">{def.label(s.key)}</span>
-                          <span className="v">{value}</span>
+                          {isNow ? (
+                            <span className="v now-mark">
+                              <span className="pip" aria-hidden="true" />
+                              In progress
+                            </span>
+                          ) : (
+                            <span className="v">{value}</span>
+                          )}
                         </button>
                         {confirmKey === s.key && (
                           <div className="rail-confirm" role="group" aria-label="Redo from here">
@@ -90,7 +118,7 @@ export function Rail({ def, results, currentKey, theme, onToggleTheme, onRevisit
         })}
       </nav>
 
-      <Moss id="rail-moss" from="bottom" width={300} height={300} seed={4} style={{ left: 0, bottom: 0 }} />
+      <Moss id="rail-moss" from="bottom" width={300} height={150} seed={4} style={{ left: 0, bottom: 0 }} />
 
       <div className="rail-foot">
         <button
