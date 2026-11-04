@@ -89,8 +89,8 @@ export function summarize(R: Results): SummarySection[] {
     const who = pet ? `${pet} (pet)` : id ? `${id.label}${id.badge ? ' ★' : ''}` : '';
     bonds.push({
       label: slot.kind === 'ally' ? 'Ally' : 'Rival',
-      value: [rel.label, who].filter(Boolean).join(' · '),
-      detail: rel.detail,
+      value: pet ? `A loyal ${pet.toLowerCase()}` : [rel.label, who].filter(Boolean).join(' · '),
+      detail: pet ? 'Your pet, a beast of CR 1/8 or lower.' : rel.detail,
       tone: slot.kind,
     });
     if (pet) benefits.push({ label: 'Companion', value: `A loyal ${pet.toLowerCase()}`, tone: 'boon' });

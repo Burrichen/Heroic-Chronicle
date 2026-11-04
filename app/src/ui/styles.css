@@ -296,13 +296,16 @@ kbd {
   pointer-events: none;
   z-index: 0;
 }
-.moss feFlood.m-a {
+.rail .moss {
+  opacity: 0.6;
+}
+.moss .m-a {
   flood-color: var(--moss-a);
 }
-.moss feFlood.m-b {
+.moss .m-b {
   flood-color: var(--moss-b);
 }
-.moss feFlood.m-c {
+.moss .m-c {
   flood-color: var(--moss-c);
 }
 
@@ -414,9 +417,7 @@ kbd {
   color: var(--text-3);
 }
 .rail-entry .v {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 .rail-entry.is-now {
   color: var(--moss);
@@ -486,6 +487,9 @@ kbd {
   gap: 1rem;
   margin-bottom: 1.6rem;
   min-height: 2.6rem;
+}
+.step-head h2:focus {
+  outline: none;
 }
 .step-head h2 {
   font-size: clamp(1.9rem, 3.2vw, 2.6rem);
@@ -906,7 +910,7 @@ kbd {
   flex-wrap: wrap;
 }
 .start-foot {
-  margin-top: 2.4rem;
+  margin-top: 1.6rem;
   font-size: 0.78rem;
   color: var(--text-3);
 }
@@ -968,6 +972,11 @@ kbd {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.2rem;
   align-items: start;
+}
+.sum-col {
+  display: grid;
+  gap: 1.2rem;
+  align-content: start;
 }
 .sum-section {
   border: 1px solid var(--line);
@@ -1070,15 +1079,12 @@ kbd {
     padding: 1rem 1rem 0.8rem;
   }
   .rail-foot {
-    position: absolute;
-    top: 0.7rem;
-    right: 0.6rem;
-    border: 0;
-    padding: 0;
+    border-top: 0;
+    padding: 0 0.6rem 0.6rem;
     background: none;
     backdrop-filter: none;
   }
-  .rail .moss {
+  .moss {
     display: none;
   }
   .main {
